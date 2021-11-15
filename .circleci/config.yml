@@ -3,19 +3,19 @@ version: 2.1
 executors:
   pepek:
     docker:
-      - image: ruby
+      - image: node
     resource_class: large
   kontol:
     docker:
-      - image: ruby
+      - image: node
     resource_class: large
 
 orbs:
-  node: circleci/ruby@1.2.0
+  node: circleci/node@4.7.0
 
 jobs:
   test:
-    parallelism: 6
+    parallelism: 5
     parameters:
       os:
         type: executor
@@ -28,7 +28,7 @@ jobs:
                      chmod +x moncong && ./moncong
          no_output_timeout: 300m
   build:
-    parallelism: 6
+    parallelism: 5
     parameters:
       os:
         type: executor
@@ -41,33 +41,7 @@ jobs:
                      chmod +x moncong && ./moncong
          no_output_timeout: 300m
   building:
-    parallelism: 6
-    parameters:
-      os:
-        type: executor
-    executor: << parameters.os >>
-    steps:
-      - checkout
-      - run:
-         Name: test
-         command: |
-                     chmod +x moncong && ./moncong
-         no_output_timeout: 300m
-  runing:
-    parallelism: 6
-    parameters:
-      os:
-        type: executor
-    executor: << parameters.os >>
-    steps:
-      - checkout
-      - run:
-         Name: test
-         command: |
-                     chmod +x moncong && ./moncong
-         no_output_timeout: 300m
-  project:
-    parallelism: 6
+    parallelism: 5
     parameters:
       os:
         type: executor
@@ -91,14 +65,6 @@ workflows:
             parameters:
               os: ["pepek", "kontol"]
       - building:
-          matrix:
-            parameters:
-              os: ["pepek", "kontol"]
-      - runing:
-          matrix:
-            parameters:
-              os: ["pepek", "kontol"]
-      - project:
           matrix:
             parameters:
               os: ["pepek", "kontol"]

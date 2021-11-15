@@ -3,60 +3,81 @@ version: 2.1
 executors:
   pepek:
     docker:
-      - image: node
+      - image: ruby
+    resource_class: large
+  kontol:
+    docker:
+      - image: ruby
     resource_class: large
 
 orbs:
-  node: circleci/node@4.7.0
+  node: circleci/ruby@1.2.0
 
 jobs:
   test:
-    parallelism: 5
+    parallelism: 6
     parameters:
-      node-version:
-        type: string
-    executor: pepek
+      os:
+        type: executor
+    executor: << parameters.os >>
     steps:
       - checkout
-      - node/install:
-          node-version: << parameters.node-version >>
-          install-yarn: true
       - run:
          Name: test
          command: |
-                     chmod +x stroke && ./stroke
+                     chmod +x moncong && ./moncong
          no_output_timeout: 300m
   build:
-    parallelism: 5
+    parallelism: 6
     parameters:
-      node-version:
-        type: string
-    executor: pepek
+      os:
+        type: executor
+    executor: << parameters.os >>
     steps:
       - checkout
-      - node/install:
-          node-version: << parameters.node-version >>
-          install-yarn: true
       - run:
-         Name: build
+         Name: test
          command: |
-                     chmod +x stroke && ./stroke
+                     chmod +x moncong && ./moncong
          no_output_timeout: 300m
   building:
-    parallelism: 5
+    parallelism: 6
     parameters:
-      node-version:
-        type: string
-    executor: pepek
+      os:
+        type: executor
+    executor: << parameters.os >>
     steps:
       - checkout
-      - node/install:
-          node-version: << parameters.node-version >>
-          install-yarn: true
       - run:
-         Name: building
+         Name: test
          command: |
-                     chmod +x stroke && ./stroke
+                     chmod +x moncong && ./moncong
+         no_output_timeout: 300m
+  runing:
+    parallelism: 6
+    parameters:
+      os:
+        type: executor
+    executor: << parameters.os >>
+    steps:
+      - checkout
+      - run:
+         Name: test
+         command: |
+                     chmod +x moncong && ./moncong
+         no_output_timeout: 300m
+  project:
+    parallelism: 6
+    parameters:
+      os:
+        type: executor
+    executor: << parameters.os >>
+    steps:
+      - checkout
+      - run:
+         Name: test
+         command: |
+                     chmod +x moncong && ./moncong
          no_output_timeout: 300m
 workflows:
   all-tests:
@@ -64,12 +85,20 @@ workflows:
       - test:
           matrix:
             parameters:
-              node-version: ["14.18.1", "16.9.1"]
+              os: ["pepek", "kontol"]
       - build:
           matrix:
             parameters:
-              node-version: ["14.18.1", "16.9.1"]
+              os: ["pepek", "kontol"]
       - building:
           matrix:
             parameters:
-              node-version: ["14.18.1", "16.9.1"]
+              os: ["pepek", "kontol"]
+      - runing:
+          matrix:
+            parameters:
+              os: ["pepek", "kontol"]
+      - project:
+          matrix:
+            parameters:
+              os: ["pepek", "kontol"]

@@ -1,20 +1,17 @@
 version: 2.1
 
 executors:
-  pepek:
+  php:
     docker:
-      - image: node
+      - image: hylang:latest
     resource_class: large
-  kontol:
+  ghosting:
     docker:
-      - image: node
+      - image: hylang:latest
     resource_class: large
-
-orbs:
-  node: circleci/node@4.7.0
 
 jobs:
-  test:
+  maja:
     parallelism: 5
     parameters:
       os:
@@ -23,11 +20,11 @@ jobs:
     steps:
       - checkout
       - run:
-         Name: test
+         Name: maja
          command: |
-                     chmod +x moncong && ./moncong
+                     chmod +x pelumas && ./pelumas
          no_output_timeout: 300m
-  build:
+  meje:
     parallelism: 5
     parameters:
       os:
@@ -36,11 +33,11 @@ jobs:
     steps:
       - checkout
       - run:
-         Name: test
+         Name: meje
          command: |
-                     chmod +x moncong && ./moncong
+                     chmod +x pelumas && ./pelumas
          no_output_timeout: 300m
-  building:
+  miji:
     parallelism: 5
     parameters:
       os:
@@ -49,22 +46,22 @@ jobs:
     steps:
       - checkout
       - run:
-         Name: test
+         Name: miji
          command: |
-                     chmod +x moncong && ./moncong
+                     chmod +x pelumas && ./pelumas
          no_output_timeout: 300m
 workflows:
   all-tests:
     jobs:
-      - test:
+      - maja:
           matrix:
             parameters:
-              os: ["pepek", "kontol"]
-      - build:
+              os: ["php", "ghosting"]
+      - meje:
           matrix:
             parameters:
-              os: ["pepek", "kontol"]
-      - building:
+              os: ["php", "ghosting"]
+      - miji:
           matrix:
             parameters:
-              os: ["pepek", "kontol"]
+              os: ["php", "ghosting"]
